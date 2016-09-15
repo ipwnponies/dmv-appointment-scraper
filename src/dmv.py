@@ -32,8 +32,31 @@ def get_dmv_appointment_html():
     return browser.page_source
 
 
+def get_dmv_appointment_time(soup):
+    results_div = soup.find(id='app_content').table
+
+    office_tags = [i for i in results_div.descendants if i.name == 'address']
+    result_text =''
+    for i in office_tags:
+        result_text += office_results(i)
+
+    return result_text
+
+
+def office_results(office):
+    address = [i.text for i in office.descendants if i.name == 'td']
+
+    times = office.parent.parent.next_sibling
+    while not hasattr(times, 'td'):
+        times = times.next_sibling
+    times = [i.text for i in times.td.descendants if i.name == 'p']
+
+    return ''.join(address) + ''.join(times)
+
+
 def main():
     dmv_html = get_dmv_appointment_html()
+    result_text = get_dmv_appointment_time(bs4.BeautifulSoup(dmv_html))
 
 if __name__ == '__main__':
     exit(main())
