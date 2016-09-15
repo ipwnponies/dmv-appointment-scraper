@@ -1,6 +1,8 @@
 #! python3
 
 import bs4
+from email.mime.text import MIMEText
+import datetime
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 
@@ -54,9 +56,24 @@ def office_results(office):
     return ''.join(address) + ''.join(times)
 
 
+def email_dmv_appointment(message):
+    '''Requires a SMTP server'''
+    message = 'Script ran at {}\n{}'.format(datetime.datetime.now(), message)
+
+    email_message = MIMEText(message)
+    email_message['Subject'] = 'DMV appoiontment times'
+    email_message['From'] = 'jngu@yelp-jngu.localdomain'
+    email_message['To'] = 'ipwnponies@gmail.com'
+
+    from subprocess import Popen, PIPE
+    p = Popen(['/usr/sbin/sendmail', '-t', '-oi'], stdin=PIPE)
+    p.communicate(email_message.as_string().encode())
+
+
 def main():
     dmv_html = get_dmv_appointment_html()
     result_text = get_dmv_appointment_time(bs4.BeautifulSoup(dmv_html))
+    email_dmv_appointment(result_text)
 
 if __name__ == '__main__':
     exit(main())
