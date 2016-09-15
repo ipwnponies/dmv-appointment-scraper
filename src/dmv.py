@@ -1,16 +1,21 @@
 #! python3
-# mapIt.py - Launches a map in the browser using an address from the command line or clipboard
 
-import webbrowser
-import sys
-import pyperclip
 import bs4
+from selenium import webdriver
+from selenium.webdriver.support.ui import Select
 
-if len(sys.argv) > 1:
-    # Get address from command line.
-    address = ' '.join(sys.argv[1:])
-else:
-    # Get address from clipboard
-    address = pyperclip.paste()
 
-webbrowser.open('https://www.google.com/maps/place/{}'.format(address))
+def get_dmv_appointment_html():
+    browser = webdriver.Chrome()
+    browser.get('https://www.dmv.ca.gov/portal/dmv/detail/portal/foa/welcome')
+    link_elem = browser.find_element_by_link_text('Office Visit Appointment')
+    link_elem.click()
+
+    return browser.page_source
+
+
+def main():
+    dmv_html = get_dmv_appointment_html()
+
+if __name__ == '__main__':
+    exit(main())
