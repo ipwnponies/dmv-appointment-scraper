@@ -1,0 +1,16 @@
+---
+mail:
+    recipients:
+        - ipwnponies@gmail.com
+    sender: jngu@yelp-jngu.localdomain
+    subject: DMV Appointment Times
+dmv:
+    welcome_url: https://www.dmv.ca.gov/portal/dmv/detail/portal/foa/welcome
+    user:
+        first_name: first
+        last_name: last
+        area_code: 555
+        phone_prefix: 555
+        phone_suffix: 5555
+    office: SAN FRANCISCO
+    task: taskDLO
