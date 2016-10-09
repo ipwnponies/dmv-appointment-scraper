@@ -1,0 +1,27 @@
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    sha: 4c90c9557da7c0d695d6a729bae8b1de4e496cbf
+    hooks:
+    -   id: trailing-whitespace
+    -   id: end-of-file-fixer
+    -   id: autopep8-wrapper
+    -   id: check-docstring-first
+    -   id: check-json
+    -   id: check-added-large-files
+    -   id: check-yaml
+    -   id: debug-statements
+    -   id: name-tests-test
+    -   id: requirements-txt-fixer
+    -   id: flake8
+-   repo: https://github.com/pre-commit/pre-commit
+    sha: bbf1f62ed686a3e321280703a227fbd957e76151
+    hooks:
+    -   id: validate_config
+    -   id: validate_manifest
+-   repo: https://github.com/asottile/reorder_python_imports
+    sha: v0.3.0
+    hooks:
+    -   id: reorder-python-imports
+-   repo: git://github.com/pre-commit/mirrors-pylint
+    sha: v1.6.4
+    hooks:
+    -   id: pylint
