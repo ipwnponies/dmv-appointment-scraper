@@ -3,6 +3,7 @@
 Script to parse the California DMV's website for appointment times.
 '''
 import datetime
+import smtplib
 from email.mime.text import MIMEText
 
 import bs4
@@ -84,9 +85,10 @@ def email_dmv_appointment(message):
     email_message['From'] = mail_config['sender']
     email_message['To'] = ','.join(mail_config['recipients'])
 
-    from subprocess import Popen, PIPE
-    popen = Popen(['/usr/sbin/sendmail', '-t', '-oi'], stdin=PIPE)
-    popen.communicate(email_message.as_string().encode())
+    with smtplib.SMTP('smtp.gmail.com:587') as server:
+        server.starttls()
+        server.login(mail_config['sender'], mail_config['password'])
+        server.send_message(email_message)
 
     print('Mail sent to: {}'.format(' '.join(mail_config['recipients'])))
 

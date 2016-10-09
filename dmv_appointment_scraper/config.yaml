@@ -1,9 +1,11 @@
+# These values need to be updated before continuing.
 ---
 mail:
     recipients:
-        - ipwnponies@gmail.com
-    sender: jngu@yelp-jngu.localdomain
+        - RECIPIENT
+    sender: GMAIL_USER
     subject: DMV Appointment Times
+    password: GMAIL_PASSWORD
 dmv:
     welcome_url: https://www.dmv.ca.gov/portal/dmv/detail/portal/foa/welcome
     user:
