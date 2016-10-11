@@ -1,9 +1,15 @@
+'''
+Utilties to read config.yaml.
+'''
 import os
+
 import yaml
 
 
 def read_config():
-    with open(os.path.join(os.path.dirname(__file__), 'config.yaml'), 'r') as f:
-        return yaml.load(f)
+    '''Load yaml config'''
 
-config = read_config()
+    with open(os.path.join(os.path.dirname(__file__), 'config.yaml'), 'r') as config_file:
+        return yaml.load(config_file)
+
+CONFIG = read_config()
