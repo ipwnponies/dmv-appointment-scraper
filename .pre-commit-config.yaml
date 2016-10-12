@@ -12,6 +12,9 @@
     -   id: name-tests-test
     -   id: requirements-txt-fixer
     -   id: flake8
+    -   id: check-case-conflict
+    -   id: detect-private-key
+    -   id: double-quote-string-fixer
 -   repo: https://github.com/pre-commit/pre-commit
     sha: bbf1f62ed686a3e321280703a227fbd957e76151
     hooks:
@@ -21,7 +24,10 @@
     sha: v0.3.0
     hooks:
     -   id: reorder-python-imports
--   repo: git://github.com/pre-commit/mirrors-pylint
-    sha: v1.6.4
+-   repo: local
     hooks:
     -   id: pylint
+        name: Pylint
+        entry: pylint
+        language: system
+        files: \.py$
