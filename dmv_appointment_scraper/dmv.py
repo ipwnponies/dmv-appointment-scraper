@@ -6,9 +6,10 @@ import datetime
 from email.mime.text import MIMEText
 
 import bs4
-from config import CONFIG
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
+
+from dmv_appointment_scraper.config import CONFIG
 
 
 def get_dmv_appointment_html():
