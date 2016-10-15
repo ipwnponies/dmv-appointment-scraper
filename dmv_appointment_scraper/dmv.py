@@ -2,6 +2,7 @@
 '''
 Script to parse the California DMV's website for appointment times.
 '''
+import argparse
 import datetime
 import smtplib
 from email.mime.text import MIMEText
@@ -93,15 +94,32 @@ def email_dmv_appointment(message):
     print('Mail sent to: {}'.format(' '.join(mail_config['recipients'])))
 
 
+def args_parse():
+    '''Parse the commmand line arguments.'''
+
+    parser = argparse.ArgumentParser(
+        description='Get current appointment times at California DMV.'
+    )
+    parser.add_argument('--email', action='store_true', help='email results')
+    return parser.parse_args()
+
+
 def main():
     '''
     Loads up a browser and queries the DMV page for appoitnment times. Parse the html and email
     results to user.
     '''
 
+    args = args_parse()
+
     dmv_html = get_dmv_appointment_html()
     result_text = get_dmv_appointment_time(bs4.BeautifulSoup(dmv_html))
-    email_dmv_appointment(result_text)
+
+    if args.email:
+        email_dmv_appointment(result_text)
+    else:
+        print(result_text)
+
     print('Success!')
 
 if __name__ == '__main__':
