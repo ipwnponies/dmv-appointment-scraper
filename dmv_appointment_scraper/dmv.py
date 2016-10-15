@@ -4,6 +4,7 @@ Script to parse the California DMV's website for appointment times.
 '''
 import argparse
 import datetime
+import re
 import smtplib
 from email.mime.text import MIMEText
 
@@ -12,6 +13,8 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 
 from dmv_appointment_scraper.config import CONFIG
+
+WHITESPACE_REGEX = re.compile(r'^\s*|\t|\s*$')
 
 
 def get_dmv_appointment_html():
@@ -65,12 +68,14 @@ def get_dmv_appointment_time(soup):
 def office_results(office):
     '''Parse the element for the appointment time text elements.'''
 
-    address = [i.text for i in office.descendants if i.name == 'td']
+    address = [WHITESPACE_REGEX.sub('', i.text)
+               for i in office.descendants if i.name == 'td']
 
     times = office.parent.parent.next_sibling
     while not hasattr(times, 'td'):
         times = times.next_sibling
-    times = [i.text for i in times.td.descendants if i.name == 'p']
+    times = [WHITESPACE_REGEX.sub('', i.text)
+             for i in times.td.descendants if i.name == 'p']
 
     return ''.join(address) + ''.join(times)
 
