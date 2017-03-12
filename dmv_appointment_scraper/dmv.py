@@ -118,7 +118,7 @@ def main():
     args = args_parse()
 
     dmv_html = get_dmv_appointment_html()
-    result_text = get_dmv_appointment_time(bs4.BeautifulSoup(dmv_html))
+    result_text = get_dmv_appointment_time(bs4.BeautifulSoup(dmv_html, 'html.parser'))
 
     if args.email:
         email_dmv_appointment(result_text)

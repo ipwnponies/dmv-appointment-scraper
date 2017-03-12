@@ -28,6 +28,6 @@
     hooks:
     -   id: pylint
         name: Pylint
-        entry: pylint
+        entry: virtualenv_run/bin/pylint
         language: system
         files: \.py$
