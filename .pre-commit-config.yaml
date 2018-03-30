@@ -1,33 +1,54 @@
+exclude: ^bin/
+fail_fast: false
+repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    sha: 1553c96e2a0d0154f3aca4c5cb0156a74a8c703d
+    rev: v1.2.3
     hooks:
-    -   id: trailing-whitespace
-    -   id: end-of-file-fixer
     -   id: autopep8-wrapper
+    -   id: check-added-large-files
+    -   id: check-byte-order-marker
+    -   id: check-case-conflict
     -   id: check-docstring-first
     -   id: check-json
-    -   id: check-added-large-files
+    -   id: check-merge-conflict
+    -   id: check-symlinks
+    -   id: check-xml
     -   id: check-yaml
     -   id: debug-statements
-    -   id: name-tests-test
-    -   id: requirements-txt-fixer
-    -   id: flake8
-    -   id: check-case-conflict
+    -   id: detect-aws-credentials
+        args:
+        - --allow-missing-credentials
     -   id: detect-private-key
     -   id: double-quote-string-fixer
--   repo: https://github.com/pre-commit/pre-commit
-    sha: v0.16.2
-    hooks:
-    -   id: validate_config
-    -   id: validate_manifest
+    -   id: end-of-file-fixer
+    -   id: fix-encoding-pragma
+        args:
+        - --remove
+    -   id: flake8
+    -   id: forbid-new-submodules
+    -   id: mixed-line-ending
+    -   id: name-tests-test
+    -   id: pretty-format-json
+        args: [
+         --autofix,
+         --no-sort-keys,
+         --indent, '4'
+        ]
+    -   id: requirements-txt-fixer
+    -   id: sort-simple-yaml
+    -   id: trailing-whitespace
 -   repo: https://github.com/asottile/reorder_python_imports
-    sha: v0.3.5
+    rev: v1.0.1
     hooks:
     -   id: reorder-python-imports
+-   repo: https://github.com/asottile/add-trailing-comma
+    rev: v0.6.4
+    hooks:
+    -   id: add-trailing-comma
 -   repo: local
     hooks:
     -   id: pylint
         name: Pylint
-        entry: virtualenv_run/bin/pylint
+        entry: venv/bin/pylint
         language: system
-        files: \.py$
+        types: [python]
