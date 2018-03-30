@@ -49,7 +49,7 @@ See https://pip.readthedocs.org/en/stable/user_guide/#environment-variables
 For example:
     PIP_INDEX_URL=https://pypi.example.com/simple venv-update
 
-Please send issues to: https://github.com/yelp/pip-faster
+Please send issues to: https://github.com/yelp/venv-update
 '''
 from __future__ import absolute_import
 from __future__ import print_function
@@ -57,9 +57,9 @@ from __future__ import unicode_literals
 
 from os.path import exists
 from os.path import join
-from os.path import realpath
+from subprocess import CalledProcessError
 
-__version__ = '1.1.0'
+__version__ = '2.1.3'
 DEFAULT_VIRTUALENV_PATH = 'venv'
 DEFAULT_OPTION_VALUES = {
     'venv=': (DEFAULT_VIRTUALENV_PATH,),
@@ -67,7 +67,7 @@ DEFAULT_OPTION_VALUES = {
     'pip-command=': ('pip-faster', 'install', '--upgrade', '--prune'),
     'bootstrap-deps=': ('venv-update==' + __version__,),
 }
-__doc__ = __doc__.format(  # pylint:disable=redefined-builtin
+__doc__ = __doc__.format(
     **dict((key, ' '.join(val)) for key, val in DEFAULT_OPTION_VALUES.items())
 )
 
@@ -142,7 +142,7 @@ def info(msg):
 
 
 def check_output(cmd):
-    from subprocess import Popen, PIPE, CalledProcessError
+    from subprocess import Popen, PIPE
     process = Popen(cmd, stdout=PIPE)
     output, _ = process.communicate()
     if process.returncode:
@@ -164,12 +164,12 @@ def exec_(argv):  # never returns
     """Wrapper to os.execv which shows the command and runs any atexit handlers (for coverage's sake).
     Like os.execv, this function never returns.
     """
-    ## info('EXEC' + colorize(argv))  # TODO: debug logging by environment variable
+    # info('EXEC' + colorize(argv))  # TODO: debug logging by environment variable
 
     # in python3, sys.exitfunc has gone away, and atexit._run_exitfuncs seems to be the only pubic-ish interface
     #   https://hg.python.org/cpython/file/3.4/Modules/atexitmodule.c#l289
     import atexit
-    atexit._run_exitfuncs()  # pylint:disable=protected-access
+    atexit._run_exitfuncs()
 
     from os import execv
     execv(argv[0], argv)
@@ -206,6 +206,9 @@ def exec_scratch_virtualenv(args):
         rename(tmp, scratch.src)
 
     import sys
+    from os.path import realpath
+    # We want to compare the paths themselves as sometimes sys.path is the same
+    # as scratch.venv, but with a suffix of bin/..
     if realpath(sys.prefix) != realpath(scratch.venv):
         # TODO-TEST: sometimes we would get a stale version of venv-update
         exec_((scratch.python, dotpy(__file__)) + args)  # never returns
@@ -249,7 +252,10 @@ def get_python_version(interpreter):
 
 
 def invalid_virtualenv_reason(venv_path, source_python, destination_python, options):
-    orig_path = get_original_path(venv_path)
+    try:
+        orig_path = get_original_path(venv_path)
+    except CalledProcessError:
+        return 'could not inspect metadata'
     if not samefile(orig_path, venv_path):
         return 'virtualenv moved %s -> %s' % (timid_relpath(orig_path), timid_relpath(venv_path))
     elif has_system_site_packages(destination_python) != options.system_site_packages:
@@ -301,6 +307,10 @@ def ensure_virtualenv(args, return_values):
     argv[:] = ('virtualenv',) + args
     info(colorize(argv))
     raise_on_failure(virtualenv.main)
+    # There might not be a venv_path if doing something like "venv= --version"
+    # and not actually asking virtualenv to make a venv.
+    if return_values.venv_path is not None:
+        run(('rm', '-rf', join(return_values.venv_path, 'local')))
 
 
 def wait_for_all_subprocesses():
@@ -361,21 +371,6 @@ def user_cache_dir():
     return getenv('XDG_CACHE_HOME', expanduser('~/.cache'))
 
 
-class CacheOpts(object):
-
-    def __init__(self):
-        # We put the cache in the directory that pip already uses.
-        # This has better security characteristics than a machine-wide cache, and is a
-        #   pattern people can use for open-source projects
-        self.pipdir = user_cache_dir() + '/pip-faster'
-        # We could combine these caches to one directory, but pip would search everything twice, going slower.
-        self.wheelhouse = self.pipdir + '/wheelhouse'
-
-        self.pip_options = (
-            '--find-links=file://' + self.wheelhouse,
-        )
-
-
 def venv_update(
         venv=DEFAULT_OPTION_VALUES['venv='],
         install=DEFAULT_OPTION_VALUES['install='],
@@ -407,7 +402,7 @@ def venv_update(
 def execfile_(filename):
     with open(filename) as code:
         code = compile(code.read(), filename, 'exec')
-        exec(code, {'__file__': filename})  # pylint:disable=exec-used
+        exec(code, {'__file__': filename})
 
 
 def pip_faster(venv_path, pip_command, install, bootstrap_deps):
@@ -423,16 +418,13 @@ def pip_faster(venv_path, pip_command, install, bootstrap_deps):
     # we always have to run the bootstrap, because the presense of an
     # executable doesn't imply the right version. pip is able to validate the
     # version in the fastpath case quickly anyway.
-    bootstrap_command = ('pip', 'install') + CacheOpts().pip_options
-    bootstrap_command += bootstrap_deps
-    run(bootstrap_command)
+    run(('pip', 'install') + bootstrap_deps)
 
     run(pip_command + install)
 
 
 def raise_on_failure(mainfunc):
     """raise if and only if mainfunc fails"""
-    from subprocess import CalledProcessError
     try:
         errors = mainfunc()
         if errors:
