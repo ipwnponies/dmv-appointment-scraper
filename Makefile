@@ -17,7 +17,11 @@ run_email: ## Run script and send email output
 
 .PHONY: venv
 venv: requirements.txt requirements-dev.txt ## Create virtualenv
-	./bin/venv-update venv= -p python3 venv/ install= -r requirements-dev.txt -r requirements.txt --quiet
+	./bin/venv-update \
+		venv= -p python3 venv/ \
+		install= -r requirements-dev.txt -r requirements.txt \
+		bootstrap-deps= -r requirements-bootstrap.txt \
+		>/dev/null
 	./venv/bin/pre-commit install
 
 .PHONY: clean
