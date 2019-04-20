@@ -32,6 +32,15 @@ and return the parsed result.
 
 ``make email`` will email the results. Configure the sender and recipient in `config.yaml <https://github.com/ipwnponies/dmv-appointment-scraper/blob/master/dmv_appointment_scraper/config.yaml>`_.
 
+Similar Projects
+----------------
+I really should have looked for prior art before embarking on this journey.
+Oh well, it was a good excuse to learn `BeatifulSoup` and `Selenium`.
+
+https://github.com/vartan/ca-dmv-poller is a Node application.
+It looks like it only deals with requests, no need to use a webdriver.
+This will be much lighter than this application.
+
 Contributing
 -------------
 #. Fork it!
