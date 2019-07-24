@@ -42,12 +42,8 @@ def get_dmv_appointment_html():
     browser.find_element_by_id('first_name').send_keys(['first_name'])
     browser.find_element_by_id('last_name').send_keys(user_config['last_name'])
     browser.find_element_by_id('area_code').send_keys(user_config['area_code'])
-    browser.find_element_by_name('telPrefix').send_keys(
-        user_config['phone_prefix'],
-    )
-    browser.find_element_by_name('telSuffix').send_keys(
-        user_config['phone_suffix'],
-    )
+    browser.find_element_by_name('telPrefix').send_keys(user_config['phone_prefix'])
+    browser.find_element_by_name('telSuffix').send_keys(user_config['phone_suffix'])
 
     browser.find_element_by_name('ApptForm').submit()
     return browser.page_source
@@ -70,18 +66,12 @@ def get_dmv_appointment_time(soup):
 def office_results(office):
     '''Parse the element for the appointment time text elements.'''
 
-    address = [
-        WHITESPACE_REGEX.sub('', i.text)
-        for i in office.descendants if i.name == 'td'
-    ]
+    address = [WHITESPACE_REGEX.sub('', i.text) for i in office.descendants if i.name == 'td']
 
     times = office.parent.parent.next_sibling
     while not hasattr(times, 'td'):
         times = times.next_sibling
-    times = [
-        WHITESPACE_REGEX.sub('', i.text)
-        for i in times.td.descendants if i.name == 'p'
-    ]
+    times = [WHITESPACE_REGEX.sub('', i.text) for i in times.td.descendants if i.name == 'p']
 
     return ''.join(address) + ''.join(times)
 
@@ -108,9 +98,7 @@ def email_dmv_appointment(message):
 def args_parse():
     '''Parse the commmand line arguments.'''
 
-    parser = argparse.ArgumentParser(
-        description='Get current appointment times at California DMV.',
-    )
+    parser = argparse.ArgumentParser(description='Get current appointment times at California DMV.')
     parser.add_argument('--email', action='store_true', help='email results')
     return parser.parse_args()
 
