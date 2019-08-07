@@ -1,6 +1,9 @@
 dmv-appointment-scraper
 =======================
 
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/ambv/black
+
 What?
 -----
 Parse the California DMV site to get the next available appointment time.
