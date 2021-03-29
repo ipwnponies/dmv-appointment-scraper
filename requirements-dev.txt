@@ -13,7 +13,7 @@ pre-commit==1.15.2
 pudb==2018.1
 pycodestyle==2.5.0
 pyflakes==2.1.1
-Pygments==2.3.1
+Pygments==2.7.4
 pylint==2.3.1
 PyYAML==5.1
 toml==0.10.0
